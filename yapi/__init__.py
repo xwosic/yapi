@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from .fastapi_wrapper import wrapp_fastapi
+from .yaml_config import Yamloader
 
 
 def fake_get() -> str:
@@ -15,6 +16,21 @@ test_mapping = {
 
 
 class Yapp(FastAPI):
-    def __init__(self, *args, yaml=None, **kwargs):
+    def __init__(self, yaml, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.config = Yamloader(path=yaml)
+        self.mapping = self.get_method_url_mapping()
         self = wrapp_fastapi(self, test_mapping)
+    
+    def get_method_url_mapping(self):
+        mapping = {
+            'get': {},
+            'post': {},
+            'put': {},
+            'delete': {}
+        }
+        for method_url in self.config['api']:
+            method, url = method_url.split(' ')
+            mapping[method][url] = None
+        print(mapping)
+        return mapping

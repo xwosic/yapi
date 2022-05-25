@@ -1,4 +1,4 @@
 from yapi import Yapp
 
 
-app = Yapp()
+app = Yapp('yapi.yaml')
