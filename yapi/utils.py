@@ -10,6 +10,9 @@ class Lexicon:
                 v = Lexicon(v)
             self.__setattr__(str(k), v)
     
+    def __getitem__(self, key: str):
+        return self.__dict__.get(key)
+    
     def __str__(self):
         result = []
         for k, v in self.__dict__.items():
@@ -36,3 +39,5 @@ l = Lexicon(
     }
 })
 print(l)
+print(l.a.d.e)
+print(l['a']['d']['e'])
