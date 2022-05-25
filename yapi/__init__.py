@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from .fastapi_wrapper import wrapp_fastapi
 from .yaml_config import Yamloader
+from .endpoint import Endpoint
 
 
 def fake_get() -> str:
@@ -31,6 +32,6 @@ class Yapp(FastAPI):
         }
         for method_url in self.config['api']:
             method, url = method_url.split(' ')
-            mapping[method][url] = None
+            mapping[method][url] = Endpoint(self.config['api'][method_url])
         print(mapping)
         return mapping
