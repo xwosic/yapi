@@ -63,3 +63,8 @@ api:
     response:
       model: UserModelResponse
       variable: $name_of_result
+  
+  delete /users/{user_id}:
+    request: none
+    operations: null
+    response: null

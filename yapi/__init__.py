@@ -21,7 +21,8 @@ class Yapp(FastAPI):
         super().__init__(*args, **kwargs)
         self.config = Yamloader(path=yaml)
         self.mapping = self.get_method_url_mapping()
-        self = wrapp_fastapi(self, test_mapping)
+        self = wrapp_fastapi(self, self.mapping)
+        print(self.mapping)
     
     def get_method_url_mapping(self):
         mapping = {
@@ -32,6 +33,6 @@ class Yapp(FastAPI):
         }
         for method_url in self.config['api']:
             method, url = method_url.split(' ')
-            mapping[method][url] = Endpoint(self.config['api'][method_url])
-        print(mapping)
+            endpoint = Endpoint(self.config['api'][method_url])
+            mapping[method][url] = endpoint.generate_call()
         return mapping
