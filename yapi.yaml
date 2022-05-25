@@ -65,6 +65,6 @@ api:
       variable: $name_of_result
   
   delete /users/{user_id}:
-    request: none
+    request: null
     operations: null
     response: null
