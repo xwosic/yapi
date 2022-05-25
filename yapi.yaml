@@ -1,0 +1,65 @@
+# dollar sign ($) - look in endpoint's memory (models, variables, etc)
+
+# main.py   (app startup: yaml validation, endpoints creation, start)
+# yapi.yml
+# models/*  (models used by endpoints)
+# logic/*   (extra python logic to run in endpoints)
+
+
+# load / set env variables
+# they will be available in each endpoint
+environment:
+  - $name_without_value  #(read from env - raise error if not there)
+  - $name: with value
+
+db:
+  use: sqlalchemy
+  # how to connect to db?
+
+api:
+  get /users/{user_id}:
+    request:
+      # user pydantic model
+      model: UserModel  #(take from models folder)
+      # in pydantic model there can be validation
+      # and here can be extra validation
+
+      # or declare input params here
+      params:
+        user_id: int
+        age: int
+
+      validation:
+        user_id:
+          exists_in_db: true
+        age:
+          default: 18  # optional: false
+
+
+    operations:
+      # executed from top to bottom
+      # sql prefix - on the right site there are sql queries to eval
+      # results of query should be saved to variable on left site
+      - sql:
+        - $name_of_variable_to_save_result: 
+            query: select * from users us join profile p on us.id=p.user_id where p.user_id=$model.user_id
+            commit: false  # by default - true
+        - $second_result:
+            query: delete from users where user_id=?
+            params: [$model.user_id]
+            commit: true
+      - python:
+        - $name_of_variable_to_save_result: $name_of_variable_to_save_result[0][0]
+        - response: UserModelResponse($name_of_variable_to_save_result)
+      - request:
+          url: https://some/url
+          auth: $utils.create_auth_header(id=model.user_id)
+          response: $response_variable
+    
+    # calling functions or running python code from cli
+    # command: bash -c "python some_logic.py arg1 arg2 ..."
+    logic: /path/to/python/logic/file function_name args, ... , key=values  #(instead of operations)
+
+    response:
+      model: UserModelResponse
+      variable: $name_of_result
