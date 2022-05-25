@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 
-def wrapp_fastapi(url_mapping):
+def wrapp_fastapi(app: FastAPI, url_mapping: dict):
     """
     This function starts FastAPI service
     and maps urls to methods.
@@ -11,9 +11,6 @@ def wrapp_fastapi(url_mapping):
         }
     }
     """
-    app = FastAPI()
-
-    # map urls to methods
     for http_method, urls_methods in url_mapping.items():
         for url, method in urls_methods.items():
             fastapi_method_wrapper = app.__getattribute__(http_method)
