@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-from .fastapi_wrapper import wrapp_fastapi
 from .yaml_config import Yamloader
 from .endpoint import Endpoint
 
@@ -9,7 +8,7 @@ class Yapp(FastAPI):
         super().__init__(*args, **kwargs)
         self.config = Yamloader(path=yaml)
         self.mapping = self.map_url_to_method()
-        self = wrapp_fastapi(self, self.mapping)
+        self = Yapp.wrapp_fastapi(self, self.mapping)
     
     def map_url_to_method(self):
         """
@@ -30,3 +29,22 @@ class Yapp(FastAPI):
             endpoint = Endpoint({method_url: self.config['api'][method_url]})
             mapping[method][url] = endpoint.generate_call()
         return mapping
+    
+    @staticmethod
+    def wrapp_fastapi(app: FastAPI, url_mapping: dict):
+        """
+        Adds endpoints to app using prepared mapping.
+        This is equivalent to:
+
+        app = FastAPI()
+
+        @app.get('/foo')
+        def bar():
+            return 'baz'
+        """
+        for http_method, urls_methods in url_mapping.items():
+            for url, method in urls_methods.items():
+                fastapi_method_wrapper = app.__getattribute__(http_method)
+                fastapi_method_wrapper(url)(method)
+        
+        return app
