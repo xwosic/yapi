@@ -9,8 +9,8 @@
 # load / set env variables
 # they will be available in each endpoint
 environment:
-  - $name_without_value  #(read from env - raise error if not there)
-  - $name: with value
+  - connection_string: sqlite:///yapi.db
+  - name: with value
 
 db:
   use: sqlalchemy
