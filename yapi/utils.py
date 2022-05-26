@@ -24,26 +24,3 @@ class Lexicon:
             return super().__getattribute__(__name)
         except AttributeError:
             return None
-
-
-l = Lexicon(
-    {
-    'a': {
-        'b': 'c', 
-        'd': {
-            'e': [
-                'f', 
-                'g', 
-                {
-                    'h': 'i'
-                }
-            ]
-        }
-    },
-    'a2': {
-        'b2': 'c2'
-    }
-})
-print(l)
-print(l.a.d.e)
-print(l['a']['d']['e'])
