@@ -29,7 +29,7 @@ class Yapp(FastAPI):
             endpoint_config = {
                 method_url: self.context.config['api'][method_url]
             }
-            endpoint_context = self.context.models
+            endpoint_context = self.context
             endpoint = Endpoint(endpoint_config, endpoint_context)
             mapping[method][url] = endpoint.generate_call()
         return mapping

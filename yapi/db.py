@@ -18,7 +18,8 @@ class DB:
     def execute(self, query: str, commit=True):
         with self.engine.connect() as conn:
             cursor = conn.execute(query, commit=commit)
-            return cursor.fetchall()
+            result = cursor.fetchall()
+            return [row._asdict() for row in result]
     
     def get_columns(self, table: str):
         inspector = inspect(self.engine)
