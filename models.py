@@ -1,6 +1,7 @@
 from pydantic import BaseModel
+from fastapi import Query
 
 
 class UserModel(BaseModel):
-    username: str
-    id: int
+    user_id: int
+    username: str = Query(None)

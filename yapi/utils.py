@@ -18,6 +18,12 @@ class Lexicon:
         for k, v in self.__dict__.items():
             result.append(f'{k}: {v}')
         return '\n'.join(result)
+    
+    def __getattribute__(self, __name: str):
+        try:
+            return super().__getattribute__(__name)
+        except AttributeError:
+            return None
 
 
 l = Lexicon(

@@ -18,6 +18,7 @@ db:
 
 api:
   get /users/{user_id}:
+    description: "This endpoint will return user specified by id or username."
     request:
       # user pydantic model
       model: UserModel  #(take from models folder)
@@ -66,5 +67,3 @@ api:
   
   delete /users/{user_id}:
     request: null
-    operations: null
-    response: null
