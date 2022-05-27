@@ -2,7 +2,7 @@ from copy import copy
 from socket import if_indextoname
 
 
-class book:
+class book(dict):
     def __init__(self, *args, **kwargs):
         for a in args:
             if isinstance(a, dict):
@@ -57,4 +57,17 @@ class book:
                         for k in element:
                             yield f'{key}|[{i}]|{k}'
     
-
+    def values(self):
+        for value in self.__dict__.values():
+            if isinstance(value, book):
+                for v in value.values():
+                    yield v
+            elif isinstance(value, (list, tuple, set)):
+                for element in value:
+                    if isinstance(element, book):
+                        for v in element.values():
+                            yield v
+                    else:
+                        yield element
+            else:
+                yield value

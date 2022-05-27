@@ -143,3 +143,15 @@ def test_iter():
         result.append(k)
     
     assert result == expected_result
+
+
+def test_iter_values():
+    b = book(test_kwargs)
+    expected_result = [2, 4, 5, 6, 7, 8, 9,
+                       10, 11, 12, 13, 14]
+    result = []
+    for i in b.values():
+        print(i)
+        result.append(i)
+    
+    assert result == expected_result
