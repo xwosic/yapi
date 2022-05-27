@@ -25,13 +25,9 @@ class Yapp(FastAPI):
             'delete': {}
         }
         for method_url in self.context.config['api']:
+            endpoint = Endpoint(method_url, self.context)
             method, url = method_url.split(' ')
-            endpoint_config = {
-                method_url: self.context.config['api'][method_url]
-            }
-            endpoint_context = self.context
-            endpoint = Endpoint(endpoint_config, endpoint_context)
-            mapping[method][url] = endpoint.generate_call()
+            mapping[method][url] = endpoint.call
         return mapping
     
     @staticmethod

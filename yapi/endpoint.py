@@ -4,14 +4,14 @@ from .context import Context
 
 
 class Endpoint:
-    def __init__(self, conf: dict, context: Context):
-        self.name = list(conf.keys())[0]
-        self.request = Lexicon(conf[self.name].get('request'))
-        self.operations = Lexicon(conf[self.name].get('operations'))
-        self.response = Lexicon(conf[self.name].get('response'))
-        self.description = conf[self.name].get('description')
+    def __init__(self, method_url: str, context: Context):
+        self.name = method_url
         self.context = context
-        print('endpoint', self.name, 'created')
+        self.request = Lexicon(self.context.config['api'][self.name].get('request'))
+        self.operations = Lexicon(self.context.config['api'][self.name].get('operations'))
+        self.response = Lexicon(self.context.config['api'][self.name].get('response'))
+        self.description = self.context.config['api'][self.name].get('description')
+        self.generated_function = self.generate_call()
 
     def __str__(self):
         result = str(self.request) \
@@ -44,4 +44,8 @@ class Endpoint:
                 return self.response
         
         func.__doc__ = self.description if self.description else ""
-        return func     
+        return func   
+
+    @property
+    def call(self):
+        return self.generated_function
