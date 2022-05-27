@@ -58,6 +58,18 @@ class book(dict):
                     if isinstance(element, book):
                         for k in element:
                             yield f'{key}|[{i}]|{k}'
+
+    def keys(self):
+        for key, value in self.__dict__.items():
+            yield key
+            if isinstance(value, book):
+                for k in value.keys():
+                    yield k
+            elif isinstance(value, list):
+                for element in value:
+                    if isinstance(element, book):
+                        for k in element.keys():
+                            yield k
     
     def values(self):
         for value in self.__dict__.values():

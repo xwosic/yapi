@@ -201,3 +201,28 @@ def test_get_values_in_loop():
         {},
         14
     ]
+
+
+def test_iter_keys():
+    b = book(test_kwargs)
+    expected_result = [
+        'a',
+        'b',
+        'c',
+        'd',
+        'e',
+        'f',
+        'g',
+        'h',
+        'i',
+        'j',
+        'k',
+        'l',
+        'm',
+        'n'  
+    ]
+    result = []
+    for k in b.keys():
+        result.append(k)
+    
+    assert result == expected_result
