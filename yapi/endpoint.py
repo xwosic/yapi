@@ -6,12 +6,15 @@ from .context import Context
 class Endpoint:
     def __init__(self, method_url: str, context: Context):
         self.name = method_url
+        print(self.name, ' -> endpoint init')
         self.context = context
         self.request = book(self.context.config['api'][self.name].get('request'))
         self.operations = book(self.context.config['api'][self.name].get('operations'))
         self.response = book(self.context.config['api'][self.name].get('response'))
         self.description = self.context.config['api'][self.name].get('description')
+        print(self.name, ' -> endpoint call generation')
         self.generated_function = self.generate_call()
+        print(self.name, ' -> endpoint created')
 
     def __str__(self):
         result = str(self.request) \
