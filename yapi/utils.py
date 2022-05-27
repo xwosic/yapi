@@ -46,26 +46,15 @@ class book:
         return '\n'.join(result)
 
     def __iter__(self):
-        # create copy before assign new attrs
-        self.__dict = copy(self.__dict__)
-        self.__keys = list(self.__dict.keys())
-        self.__values = list(self.__dict.values())
-        self.__len_dict = len(self.__dict)
-        self.__n = 0
-        return self
+        for key, value in self.__dict__.items():
+            yield key
+            if isinstance(value, book):
+                for k in value:
+                    yield f'{key}|{k}'
+            elif isinstance(value, list):
+                for i, element in enumerate(value):
+                    if isinstance(element, book):
+                        for k in element:
+                            yield f'{key}[{i}]|{k}'
     
-    def __next__(self):
-        if self.__n < self.__len_dict:
-            key = self.__keys[self.__n]
-            value = self.__values[self.__n]
-            self.__n += 1
-            return key
-        else:
-            # stop iteration
-            # and delete technical variables
-            del self.__dict
-            del self.__keys
-            del self.__values
-            del self.__len_dict
-            del self.__n
-            raise StopIteration
+

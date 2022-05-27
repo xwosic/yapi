@@ -19,7 +19,15 @@ test_kwargs = {
             {
                 'i': {
                     'j': 11,
-                    'k': 12
+                    'k': 12,
+                    'l': [
+                        13, 
+                        {
+                            'm': {
+                                'n': 14
+                            }
+                        }
+                    ]
                 }
             }
         ]
@@ -102,7 +110,7 @@ def test_iter_repetition():
 def test_iter_repetition():
     b = book(test_kwargs)
     expected_result = ['a', 'b', 'c', 'd', 'e',
-                       'f', 'g', 'h', 'i', 'j', 'k']
+                       'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n']
     result = []
     for k in b:
         print('key', k)
