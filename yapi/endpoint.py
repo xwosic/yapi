@@ -1,6 +1,7 @@
 from .utils import book
 from fastapi import Depends
 from .context import Context
+from .operations import Operations
 
 
 class Endpoint:
@@ -9,7 +10,7 @@ class Endpoint:
         print(self.name, ' -> endpoint init')
         self.context = context
         self.request = book(self.context.config['api'][self.name].get('request'))
-        self.operations = book(self.context.config['api'][self.name].get('operations'))
+        self.operations = Operations(conf=self.context.config['api'][self.name].get('operations'))
         self.response = book(self.context.config['api'][self.name].get('response'))
         self.description = self.context.config['api'][self.name].get('description')
         print(self.name, ' -> endpoint call generation')
@@ -38,13 +39,15 @@ class Endpoint:
         
         if request_model:
             def func(param: request_model = Depends()):
-                query = 'select * from users'
-                result = self.context.db.execute(query)
+                # query = 'select * from users'
+                # result = self.context.db.execute(query)
+                result = self.operations.execute()
+                print(result)
 
                 return result
         else:
             def func():
-                return self.response
+                return self.operations.execute()
         
         func.__doc__ = self.description if self.description else ""
         return func   
