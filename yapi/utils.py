@@ -1,3 +1,4 @@
+from copy import copy
 from socket import if_indextoname
 
 
@@ -6,6 +7,7 @@ class book:
         for a in args:
             if isinstance(a, dict):
                 kwargs = {**kwargs, **a}
+
         self.dict_to_book(**kwargs)
 
     def dict_to_book(self, **kwargs):
@@ -42,3 +44,28 @@ class book:
         for k, v in self.__dict__.items():
             result.append(f'{k}: {v}')
         return '\n'.join(result)
+
+    def __iter__(self):
+        # create copy before assign new attrs
+        self.__dict = copy(self.__dict__)
+        self.__keys = list(self.__dict.keys())
+        self.__values = list(self.__dict.values())
+        self.__len_dict = len(self.__dict)
+        self.__n = 0
+        return self
+    
+    def __next__(self):
+        if self.__n < self.__len_dict:
+            key = self.__keys[self.__n]
+            value = self.__values[self.__n]
+            self.__n += 1
+            return key
+        else:
+            # stop iteration
+            # and delete technical variables
+            del self.__dict
+            del self.__keys
+            del self.__values
+            del self.__len_dict
+            del self.__n
+            raise StopIteration
