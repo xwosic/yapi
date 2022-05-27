@@ -1,4 +1,4 @@
-from .utils import Lexicon
+from .utils import book
 from fastapi import Depends
 from .context import Context
 
@@ -7,9 +7,9 @@ class Endpoint:
     def __init__(self, method_url: str, context: Context):
         self.name = method_url
         self.context = context
-        self.request = Lexicon(self.context.config['api'][self.name].get('request'))
-        self.operations = Lexicon(self.context.config['api'][self.name].get('operations'))
-        self.response = Lexicon(self.context.config['api'][self.name].get('response'))
+        self.request = book(self.context.config['api'][self.name].get('request'))
+        self.operations = book(self.context.config['api'][self.name].get('operations'))
+        self.response = book(self.context.config['api'][self.name].get('response'))
         self.description = self.context.config['api'][self.name].get('description')
         self.generated_function = self.generate_call()
 

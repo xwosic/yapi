@@ -1,4 +1,4 @@
-class Lexicon:
+class book:
     def __init__(self, conf=None, **kwargs):
         if isinstance(conf, dict):
             kwargs = {**conf, **kwargs}
@@ -7,7 +7,7 @@ class Lexicon:
 
         for k, v in kwargs.items():
             if isinstance(v, dict):
-                v = Lexicon(v)
+                v = book(v)
             self.__setattr__(str(k), v)
     
     def __getitem__(self, key: str):
