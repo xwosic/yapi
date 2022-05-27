@@ -80,7 +80,15 @@ def test_book_creation_from_list_of_dicts():
 
 def test_book_str():
     b = book(**test_kwargs)
-    # print(b)
+    assert str(b) == 'a|b: 2\n' \
+                     'a|c|d: [4, 5, 6]\n' \
+                     'a|c|e: (7, 8, 9)\n' \
+                     'f|g: [{}, {}]\n' \
+                     'f|g|[0]|h: 10\n' \
+                     'f|g|[1]|i|j: 11\n' \
+                     'f|g|[1]|i|k: 12\n' \
+                     'f|g|[1]|i|l: [13, {}]\n' \
+                     'f|g|[1]|i|l|[1]|m|n: 14\n'
 
 
 def test_empty_book():
@@ -151,7 +159,45 @@ def test_iter_values():
                        10, 11, 12, 13, 14]
     result = []
     for i in b.values():
-        print(i)
         result.append(i)
     
     assert result == expected_result
+
+
+def test_get_value():
+    b = book(test_kwargs)
+
+    result = b.get_value('f|g|[1]|i|l|[1]|m|n')
+
+    assert result == 14
+
+    result = b.get_value('a|c|d|[1]')
+
+    assert result == 5
+
+
+def test_get_values_in_loop():
+    b = book(test_kwargs)
+
+    result = []
+
+    for k in b:
+        r = b.get_value(k)
+        result.append(r)
+    
+    assert result == [
+        {},
+        2,
+        {},
+        [4, 5, 6],
+        (7, 8, 9),
+        {},
+        [{}, {}],
+        10,
+        {},
+        11,
+        12,
+        [13, {}],
+        {},
+        14
+    ]

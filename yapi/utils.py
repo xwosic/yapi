@@ -40,10 +40,12 @@ class book(dict):
             return None
 
     def __str__(self):
-        result = []
-        for k, v in self.__dict__.items():
-            result.append(f'{k}: {v}')
-        return '\n'.join(result)
+        result = ''
+        for k in self:
+            v = self.get_value(k)
+            if not isinstance(v, book):
+                result += f'{k}: {v}\n'
+        return result
 
     def __iter__(self):
         for key, value in self.__dict__.items():
@@ -71,3 +73,13 @@ class book(dict):
                         yield element
             else:
                 yield value
+    
+    def get_value(self, key: str):
+        key = key.split('|')
+        attr = self
+        for k in key:
+            if '[' in k:
+                k = k.lstrip('[').rstrip(']')
+                k = int(k)
+            attr = attr[k]
+        return attr
