@@ -50,8 +50,9 @@ api:
       #       params: [$model.user_id]
       #       commit: true
       - python:
-          $name_of_variable_to_save_result: 1 + 3
-          # response: UserModelResponse($name_of_variable_to_save_result)
+          name_of_variable_to_save_result: 1 + 3
+          response: name_of_variable_to_save_result + 1
+          finally: name = '123'
       # - request:
       #     $name_of_result:
       #       url: https://some/url

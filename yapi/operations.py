@@ -4,9 +4,8 @@ from typing import Dict, List
 
 class Operations:
     def __init__(self, conf: List[Dict[str, str]], ns: dict = None):
-        if conf:
-            self.ns = ns if ns else {}
-            self.blocks = self.create_blocks(conf)
+        self.ns = ns if ns else {}
+        self.blocks = self.create_blocks(conf) if conf else []
     
     def create_blocks(self, conf: dict):
         mapping = {
@@ -22,11 +21,10 @@ class Operations:
         return blocks
     
     def execute(self):
-        results = []
         for block in self.blocks:
-            results.append(block.execute_tasks())
+            block.execute_tasks()
         
-        return results
+        return self.ns
 
 
 class Block:
@@ -43,10 +41,8 @@ class Block:
         return tasks
     
     def execute_tasks(self):
-        results = {}
-        for variable, task in self.tasks.items():
-            results[variable] = task.execute()
-        return results
+        for task in self.tasks.values():
+            task.execute()
 
 
 class Task:
@@ -56,7 +52,16 @@ class Task:
         self.ns = ns
     
     def execute(self):
-        return eval(self.command, self.ns)
+        args = [
+            self.command, 
+            {}, 
+            self.ns
+        ]
+        if '=' in self.command:
+            exec(*args)
+        
+        else:
+            self.ns[self.variable] = eval(*args)
 
 
 class TaskWithOptions(Task):
@@ -69,7 +74,8 @@ class TaskWithOptions(Task):
     def create_command(self):
         raise NotImplemented('Define command.')
 
-
+# query = 'select * from users'
+# result = self.context.db.execute(query)
 class SQLBlock(Block):
     pass
 

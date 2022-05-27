@@ -39,10 +39,7 @@ class Endpoint:
         
         if request_model:
             def func(param: request_model = Depends()):
-                # query = 'select * from users'
-                # result = self.context.db.execute(query)
                 result = self.operations.execute()
-                print(result)
 
                 return result
         else:
