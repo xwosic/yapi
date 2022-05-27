@@ -90,10 +90,24 @@ def test_empty_book():
 
 def test_iter_repetition():
     b = book(test_kwargs)
-    expected_result = ['a', 'f']
+    expected_result = [
+        'a',
+        'a|b',
+        'a|c',
+        'a|c|d',
+        'a|c|e',
+        'f',
+        'f|g',
+        'f|g|[0]|h',
+        'f|g|[1]|i',
+        'f|g|[1]|i|j',
+        'f|g|[1]|i|k',
+        'f|g|[1]|i|l',
+        'f|g|[1]|i|l|[1]|m',
+        'f|g|[1]|i|l|[1]|m|n'
+    ]
     result = []
     for k in b:
-        print(k)
         result.append(k)
     
     assert result == expected_result
@@ -101,19 +115,31 @@ def test_iter_repetition():
     # two times the same result
     result = []
     for k in b:
-        print(k)
         result.append(k)
     
     assert result == expected_result
 
 
-def test_iter_repetition():
+def test_iter():
     b = book(test_kwargs)
-    expected_result = ['a', 'b', 'c', 'd', 'e',
-                       'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n']
+    expected_result = [
+        'a',
+        'a|b',
+        'a|c',
+        'a|c|d',
+        'a|c|e',
+        'f',
+        'f|g',
+        'f|g|[0]|h',
+        'f|g|[1]|i',
+        'f|g|[1]|i|j',
+        'f|g|[1]|i|k',
+        'f|g|[1]|i|l',
+        'f|g|[1]|i|l|[1]|m',
+        'f|g|[1]|i|l|[1]|m|n'
+    ]
     result = []
     for k in b:
-        print('key', k)
         result.append(k)
     
     assert result == expected_result

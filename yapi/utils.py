@@ -55,6 +55,6 @@ class book:
                 for i, element in enumerate(value):
                     if isinstance(element, book):
                         for k in element:
-                            yield f'{key}[{i}]|{k}'
+                            yield f'{key}|[{i}]|{k}'
     
 
