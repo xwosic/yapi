@@ -41,14 +41,14 @@ api:
       # executed from top to bottom
       # sql prefix - on the right site there are sql queries to eval
       # results of query should be saved to variable on left site
-      # - sql:
-      #     $name_of_variable_to_save_result: 
-      #       query: select * from users us join profile p on us.id=p.user_id where p.user_id=$model.user_id
-      #       commit: false  # by default - true
-      #     $second_result:
-      #       query: delete from users where user_id=?
-      #       params: [$model.user_id]
-      #       commit: true
+      - sql:
+          name_of_variable_to_save_result: 
+            query: select * from users
+            commit: false  # by default - true
+          second_result:
+            query: delete from users where user_id=2
+            params: [$model.user_id]
+            commit: true
       - python:
           name_of_variable_to_save_result: 1 + 3
           response: name_of_variable_to_save_result + 1

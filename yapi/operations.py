@@ -1,4 +1,3 @@
-from os import strerror
 from typing import Dict, List
 
 
@@ -27,24 +26,6 @@ class Operations:
         return self.ns
 
 
-class Block:
-    def __init__(self, conf: dict, ns: dict):
-        self.conf = conf
-        self.ns = ns
-        self.tasks = self.create_tasks()
-    
-    def create_tasks(self):
-        tasks: Dict[Task] = {}
-        for variable, command in self.conf.items():
-            tasks[variable] = Task(variable, command, ns=self.ns)
-
-        return tasks
-    
-    def execute_tasks(self):
-        for task in self.tasks.values():
-            task.execute()
-
-
 class Task:
     def __init__(self, variable: str, command: dict, ns: dict) -> None:
         self.variable = variable
@@ -57,27 +38,72 @@ class Task:
             {}, 
             self.ns
         ]
-        if '=' in self.command:
+        if '=' in self.command:  # to do sth more accurate
             exec(*args)
         
         else:
             self.ns[self.variable] = eval(*args)
 
 
+class Block:
+    task_type = Task
+
+    def __init__(self, conf: dict, ns: dict):
+        self.conf = conf
+        self.ns = ns
+        self.tasks = self.create_tasks()
+    
+    def create_tasks(self):
+        tasks: Dict[self.task_type] = {}
+        for variable, command_or_options in self.conf.items():
+            print('creating', self.task_type, 'type task')
+            tasks[variable] = self.task_type(
+                variable, 
+                command_or_options, 
+                ns=self.ns
+            )
+
+        return tasks
+    
+    def execute_tasks(self):
+        for name, task in self.tasks.items():
+            print('start executing task:', name)
+            task.execute()
+            print('task comleted')
+
+
 class TaskWithOptions(Task):
-    def __init__(self, variable: str, options: str, ns: dict):
+    def __init__(self, variable: str, options: dict, ns: dict):
         self.variable = variable
         self.options = options
         self.ns = ns
         self.command = self.create_command()
 
     def create_command(self):
-        raise NotImplemented('Define command.')
+        raise NotImplementedError('Define command.')
 
 # query = 'select * from users'
 # result = self.context.db.execute(query)
+
+class SQLTask(TaskWithOptions):
+    def create_command(self):
+        query: str = self.options.get('query')
+        if query is None:
+            raise NotImplementedError(
+                '"query" field is required '
+                'in sql options.'
+            )
+        if not query.startswith('"') \
+           and not query.startswith("'"):
+            query = '"' + query + '"'
+        
+        self.command = f'db.execute({query})'
+        print('command created', self.command)
+        
+
+
 class SQLBlock(Block):
-    pass
+    task_type = SQLTask
 
 
 class PythonBlock(Block):
