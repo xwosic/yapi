@@ -42,11 +42,12 @@ class Endpoint:
                 ns = {}
                 ns = self.request.put_params_to_ns(params, ns)
                 ns = self.operations.execute(ns)
-
                 return ns
         else:
             def func():
-                return self.operations.execute()
+                ns = {}
+                ns = self.operations.execute(ns)
+                return ns
         
         func.__doc__ = self.description if self.description else ""
         return func   

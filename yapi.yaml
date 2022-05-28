@@ -30,6 +30,14 @@ api:
               select * 
               from users 
               where id=UserId.user_id
+
+  get /users:
+    description: |
+      this endpoint returns all users
+    operations:
+      - sql:
+          users:
+            query: select * from users
   
   post /users:
     request:

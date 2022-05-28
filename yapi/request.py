@@ -61,11 +61,13 @@ class YappRequest:
             return result
     
     def put_params_to_ns(self, input_params: BaseModel, ns: dict) -> dict:
+        """
+        Converts request params to dict and adds
+        them to enpoint's execution namespace.
+        """
         model_name = type(input_params).__name__
-        print('add model to request', model_name)
         for k, v in input_params.dict().items():
             ns[f'{model_name}.{k}'] = v
-        print(ns)
         return ns
     
     def put_dependency_results_to_ns(self):
