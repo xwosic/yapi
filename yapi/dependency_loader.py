@@ -20,13 +20,11 @@ class DependenciesLoader:
 
         imported_dependencies = {}
         namespace = globals()
-        print(namespace)
         for d in dir(dependencies):
-            if d.startswith('__') or d.endswith('__'):
+            if d.startswith('_') or d.endswith('_'):
                 continue
             imported_dependencies[d] = namespace[d]
-        
         return imported_dependencies
     
     def __getitem__(self, key: str):
-        return self.dependencies.get(key)
+        return self.dependencies[key]

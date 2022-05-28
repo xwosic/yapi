@@ -15,8 +15,8 @@ class Yapp(FastAPI):
         Create mapping used to wrapp fastapi app
         in yapi app.
         Splits "get /foo/bar" -> "get" and "/foo/bar".
-        Then parses yaml into an endpoint which is used
-        to generate server's response function.
+        Then parses yaml into an endpoint and dependencies
+        which are used to generate server's response function.
         """
         mapping = {
             'get': {},
@@ -27,7 +27,10 @@ class Yapp(FastAPI):
         for method_url in self.context.config['api']:
             endpoint = Endpoint(method_url, self.context)
             method, url = method_url.split(' ')
-            mapping[method][url] = endpoint.call
+            mapping[method][url] = {
+                'call': endpoint.call,
+                'dependencies': endpoint.request.dependencies
+            }
         return mapping
     
     @staticmethod
@@ -42,13 +45,12 @@ class Yapp(FastAPI):
         def bar():
             return 'baz'
         """
-        def foo():
-            print('var')
-            return 'bar'
-
         for http_method, urls_methods in url_mapping.items():
-            for url, method in urls_methods.items():
+            for url, endp_deps in urls_methods.items():
                 fastapi_method_wrapper = app.__getattribute__(http_method)
-                fastapi_method_wrapper(url, dependencies=[Depends(foo)])(method)
+                fastapi_method_wrapper(
+                    url, 
+                    dependencies=endp_deps['dependencies']
+                )(endp_deps['call'])
         
         return app

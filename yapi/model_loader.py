@@ -26,4 +26,4 @@ class ModelLoader:
         return imported_models
     
     def __getitem__(self, key: str):
-        return self.models.get(key)
+        return self.models[key]

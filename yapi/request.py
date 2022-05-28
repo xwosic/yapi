@@ -50,14 +50,14 @@ class YappRequest:
         """
         deps = conf.get('dependencies')
         if deps:
-            result = {}
-            for variable, dependency_name in deps.items():
+            result = []
+            for dependency_name in deps:
                 try:
                     dependency_method = self.context_dependencies[dependency_name]
                 except KeyError:
                     raise ValueError(f'There is no {dependency_name}'
                                      ' in dependencies.py')
-                result[variable] = Depends(dependency_method)
+                result.append(Depends(dependency_method))
             return result
     
     def put_params_to_ns(self, input_params: BaseModel, ns: dict) -> dict:

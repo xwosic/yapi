@@ -23,6 +23,8 @@ api:
       response contains fields: id, first_name, last_name
     request:
       model: UserId
+      dependencies: 
+        - auth
     operations:
       - sql:
           users:
@@ -78,8 +80,8 @@ api:
   get /test:
     description: "This endpoint will return user specified by id or username."
     request:
-      # user pydantic model
-      model: UserModel  #(take from models folder)
+      # user pydanticmodel
+      model: User  #(take from models folder)
       # in pydantic model there can be validation
       # and here can be extra validation
 
@@ -89,7 +91,7 @@ api:
         age:
           default: 18  # optional: false
       dependencies:
-        dependency_variable: name_of_method to put inside Depends()
+        - auth
 
 
     operations:
@@ -120,5 +122,5 @@ api:
     logic: /path/to/python/logic/file function_name args, ... , key=values  #(instead of operations)
 
     response:
-      model: UserModelResponse
+      model: User
       variable: $name_of_result
