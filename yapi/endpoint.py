@@ -38,19 +38,19 @@ class Endpoint:
         request_model = self.request.request_model
         
         if request_model:
-            def func(params: request_model = Depends()):
+            def endpoint(params: request_model = Depends()):
                 ns = {}
                 ns = self.request.put_params_to_ns(params, ns)
                 ns = self.operations.execute(ns)
                 return ns
         else:
-            def func():
+            def endpoint():
                 ns = {}
                 ns = self.operations.execute(ns)
                 return ns
         
-        func.__doc__ = self.description if self.description else ""
-        return func   
+        endpoint.__doc__ = self.description if self.description else ""
+        return endpoint   
 
     @property
     def call(self):
