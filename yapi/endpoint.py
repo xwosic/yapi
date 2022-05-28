@@ -11,7 +11,7 @@ class Endpoint:
         self.context = context
         self.request = book(self.context.config['api'][self.name].get('request'))
         namespace = {'db': self.context.db}
-        self.operations = Operations(conf=self.context.config['api'][self.name].get('operations'))
+        self.operations = Operations(conf=self.context.config['api'][self.name].get('operations'), ns=namespace)
         self.response = book(self.context.config['api'][self.name].get('response'))
         self.description = self.context.config['api'][self.name].get('description')
         print(self.name, ' -> endpoint call generation')

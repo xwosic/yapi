@@ -42,17 +42,18 @@ api:
       # sql prefix - on the right site there are sql queries to eval
       # results of query should be saved to variable on left site
       - sql:
-          name_of_variable_to_save_result: 
+          users: 
             query: select * from users
-            commit: false  # by default - true
+            commit: false
           second_result:
-            query: delete from users where user_id=2
-            params: [$model.user_id]
+            query: "insert into users (id, first_name, last_name) values (2, 'foo', 'bar')"
             commit: true
       - python:
           name_of_variable_to_save_result: 1 + 3
           response: name_of_variable_to_save_result + 1
-          finally: name = '123'
+          name: 123
+          name_2: "123.4"
+          name_3: "'asdf'"
       # - request:
       #     $name_of_result:
       #       url: https://some/url
