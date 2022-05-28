@@ -2,11 +2,11 @@ from pydantic import BaseModel
 from fastapi import Query
 
 
-class UserModel(BaseModel):
+class UserId(BaseModel):
     user_id: int
 
 
-class NewUser(BaseModel):
+class User(BaseModel):
     id: int
     first_name: str
     last_name: str

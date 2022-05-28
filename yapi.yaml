@@ -22,20 +22,18 @@ api:
       this endpoint returns user with provided id
       response contains fields: id, first_name, last_name
     request:
-      model: UserModel
-
+      model: UserId
     operations:
       - sql:
           users:
             query: |
               select * 
               from users 
-              where id=UserModel.user_id
+              where id=UserId.user_id
   
   post /users:
     request:
-      model: NewUser
-    
+      model: User
     operations:
       - sql:
           users:
@@ -43,8 +41,31 @@ api:
               insert into users 
               (id, first_name, last_name) 
               values 
-              (NewUser.id, NewUser.first_name, NewUser.last_name)
-
+              (User.id, User.first_name, User.last_name)
+  
+  put /users/{user_id}:
+    request:
+      model: User
+    operations:
+      - sql:
+          users:
+            query: |
+              update users
+              set
+                first_name=User.first_name,
+                last_name=User.last_name
+              where
+                id=User.id
+  
+  delete /users/{user_id}:
+    request:
+      model: UserId
+    operations:
+      - sql:
+          users:
+            query: |
+              delete from users
+              where id=UserId.user_id
 
   get /test:
     description: "This endpoint will return user specified by id or username."
@@ -93,6 +114,3 @@ api:
     response:
       model: UserModelResponse
       variable: $name_of_result
-  
-  delete /users/{user_id}:
-    request: null
