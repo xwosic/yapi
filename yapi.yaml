@@ -17,16 +17,14 @@ db:
   # how to connect to db?
 
 api:
-  get /zuzowy:
+  get /test:
     request:
       model: UserModel
 
     operations:
-      - python:
-          user_ids: (1, 2)
       - sql:
           users:
-            query: select * from users where id in user_ids
+            query: select * from users where id=params.user_id
 
   get /users/{user_id}:
     description: "This endpoint will return user specified by id or username."

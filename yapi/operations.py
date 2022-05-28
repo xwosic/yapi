@@ -42,7 +42,7 @@ class Task:
         'required': []
     }
 
-    def __init__(self, variable: str, options: Union[str, int, dict], ns: dict, db) -> None:
+    def __init__(self, variable: str, options, ns: dict, db) -> None:
         self.variable = variable
         self.ns = ns
         self.db = db
@@ -51,18 +51,21 @@ class Task:
         self.command = self.create_command()
     
     def recognize_syntax(self, options: Union[str, dict]):
-        if isinstance(options, str):
-            # this is variable: command syntax
-            self.task_type = 'task'
-            return options, None
-        elif isinstance(options, (int, float)):
-            self.task_type = 'task'
-            options = str(options)
-            return options, None
-        elif isinstance(options, dict):
-            # this is variable: {options} syntax
-            self.task_type = 'task_with_options'
-            return None, options
+        try:
+            if isinstance(options, str):
+                # this is variable: command syntax
+                self.task_type = 'task'
+                return options, None
+            elif isinstance(options, (int, float)):
+                self.task_type = 'task'
+                options = str(options)
+                return options, None
+            elif isinstance(options, dict):
+                # this is variable: {options} syntax
+                self.task_type = 'task_with_options'
+                return None, options
+        except Exception as ex:
+            raise ValueError(f'Failed to parse: {variable}: {options}. Error: {ex}')
     
     def create_command(self):
         if self.task_type == 'task':
@@ -84,6 +87,17 @@ class Task:
         
         command = self.options_config['command_preparation'](self, self.options)
         return command
+    
+    def convert_python_str_to_sql(self, value):
+        if isinstance(value, str):
+            return f"'{value}'"
+        elif isinstance(value, (int, float)):
+            return str(value)
+        elif isinstance(value, (list, tuple)):
+            return '(' + ', '.join(value) + ')'
+        elif isinstance(value, dict):
+            k_v_list = [f"{k}={self.convert_python_str_to_sql(v)}" for k, v in value.items()]
+            return ', '.join(k_v_list)
     
     def replace_variables_with_values_from_ns(self, command: str):
         for k, v in self.ns.items():
