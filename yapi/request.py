@@ -69,9 +69,6 @@ class YappRequest:
         for k, v in input_params.dict().items():
             ns[f'{model_name}.{k}'] = v
         return ns
-    
-    def put_dependency_results_to_ns(self):
-        pass
 
     def extra_validation(self):
         pass
