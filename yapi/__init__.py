@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from .endpoint import Endpoint
 from .context import Context
 
@@ -42,9 +42,13 @@ class Yapp(FastAPI):
         def bar():
             return 'baz'
         """
+        def foo():
+            print('var')
+            return 'bar'
+
         for http_method, urls_methods in url_mapping.items():
             for url, method in urls_methods.items():
                 fastapi_method_wrapper = app.__getattribute__(http_method)
-                fastapi_method_wrapper(url)(method)
+                fastapi_method_wrapper(url, dependencies=[Depends(foo)])(method)
         
         return app
