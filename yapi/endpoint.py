@@ -10,8 +10,7 @@ class Endpoint:
         print(self.name, ' -> endpoint init')
         self.context = context
         self.request = book(self.context.config['api'][self.name].get('request'))
-        namespace = {'db': self.context.db}
-        self.operations = Operations(conf=self.context.config['api'][self.name].get('operations'), ns=namespace)
+        self.operations = Operations(conf=self.context.config['api'][self.name].get('operations'), db=self.context.db)
         self.response = book(self.context.config['api'][self.name].get('response'))
         self.description = self.context.config['api'][self.name].get('description')
         print(self.name, ' -> endpoint call generation')
@@ -39,7 +38,7 @@ class Endpoint:
         response_model = self.context.models[self.response.model]
         
         if request_model:
-            def func(param: request_model = Depends()):
+            def func(params: request_model = Depends()):
                 result = self.operations.execute()
 
                 return result

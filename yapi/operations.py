@@ -1,9 +1,11 @@
+import re
 from typing import Callable, Dict, List, Union
 from copy import copy
 
 
 class Operations:
-    def __init__(self, conf: List[Dict[str, str]], ns: dict = None):
+    def __init__(self, conf: List[Dict[str, str]], db, ns: dict = None):
+        self.db = db
         self.ns = ns if ns else {}
         self.blocks = self.create_blocks(conf) if conf else []
     
@@ -16,15 +18,17 @@ class Operations:
         blocks: List[Block] = []
         for block in conf:
             for block_type, block_config in block.items():
-                blocks.append(mapping[block_type](block_config, ns=self.ns))
+                blocks.append(mapping[block_type](block_config, ns=self.ns, db=self.db))
         
         return blocks
     
     def execute(self):
         for block in self.blocks:
+            print('ns before:', self.ns)
             block.execute_tasks()
+            print('ns after:', self.ns)
         
-        return self.remove_fragile_info_from_result()
+        return self.ns
     
     def remove_fragile_info_from_result(self):
         result = copy(self.ns)
@@ -38,9 +42,10 @@ class Task:
         'required': []
     }
 
-    def __init__(self, variable: str, options: Union[str, int, dict], ns: dict) -> None:
+    def __init__(self, variable: str, options: Union[str, int, dict], ns: dict, db) -> None:
         self.variable = variable
         self.ns = ns
+        self.db = db
         self.task_type = None  # 'task' / 'task_with_options'
         self.command, self.options = self.recognize_syntax(options)
         self.command = self.create_command()
@@ -80,18 +85,25 @@ class Task:
         command = self.options_config['command_preparation'](self, self.options)
         return command
     
+    def replace_variables_with_values_from_ns(self, command: str):
+        for k, v in self.ns.items():
+            print(k, '->', v)
+            command = command.replace(k, str(v))
+        return command
+    
     def execute(self):
         if isinstance(self.command, str):
-            print('executing command:', self.command, 'on', self.variable)
             args = [
                 self.command, 
                 {}, 
                 self.ns
             ]
             if '=' in self.command:  # to do sth more accurate
+                print('executing command:', self.command, 'on', self.variable)
                 exec(*args)
             
             else:
+                print('evaluating command:', self.command, 'on', self.variable)
                 self.ns[self.variable] = eval(*args)
 
         elif isinstance(self.command, Callable):
@@ -104,8 +116,10 @@ class SQLTask(Task):
         query: str = options['query']
         
         def db_executor(ns: dict):
+            nonlocal query
+            query = self.replace_variables_with_values_from_ns(query)
             print(f'executing query: {query}')
-            return ns['db'].execute(query)
+            return self.db.execute(query)
         
         return db_executor
 
@@ -148,9 +162,10 @@ class SQLTask(Task):
 class Block:
     task_type = Task
 
-    def __init__(self, conf: dict, ns: dict):
+    def __init__(self, conf: dict, ns: dict, db):
         self.conf = conf
         self.ns = ns
+        self.db = db
         self.tasks = self.create_tasks()
     
     def create_tasks(self):
@@ -160,7 +175,8 @@ class Block:
             tasks[variable] = self.task_type(
                 variable, 
                 command_or_options, 
-                ns=self.ns
+                ns=self.ns,
+                db=self.db
             )
 
         return tasks
