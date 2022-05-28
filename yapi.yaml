@@ -24,7 +24,7 @@ api:
     operations:
       - sql:
           users:
-            query: select * from users where id=params.user_id
+            query: select * from users where id=UserModel.user_id
 
   get /users/{user_id}:
     description: "This endpoint will return user specified by id or username."
@@ -34,16 +34,13 @@ api:
       # in pydantic model there can be validation
       # and here can be extra validation
 
-      # or declare input params here
-      params:
-        user_id: int
-        age: int
-
       validation:
         user_id:
           exists_in_db: true
         age:
           default: 18  # optional: false
+      dependencies:
+        dependency_variable: name_of_method to put inside Depends()
 
 
     operations:

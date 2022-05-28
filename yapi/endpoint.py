@@ -1,3 +1,4 @@
+from yapi.request import YappRequest
 from .utils import book
 from fastapi import Depends
 from .context import Context
@@ -9,8 +10,8 @@ class Endpoint:
         self.name = method_url
         print(self.name, ' -> endpoint init')
         self.context = context
-        self.request = book(self.context.config['api'][self.name].get('request'))
-        self.operations = Operations(conf=self.context.config['api'][self.name].get('operations'), db=self.context.db)
+        self.request = YappRequest(self.context.config['api'][self.name].get('request'), self.context)
+        self.operations = Operations(self.context.config['api'][self.name].get('operations'), self.context)
         self.response = book(self.context.config['api'][self.name].get('response'))
         self.description = self.context.config['api'][self.name].get('description')
         print(self.name, ' -> endpoint call generation')
@@ -34,14 +35,15 @@ class Endpoint:
             This is more complicated but also more straightforward.
             last(second(first(*args, **kwargs)))
         """
-        request_model = self.context.models[self.request.model]
-        response_model = self.context.models[self.response.model]
+        request_model = self.request.request_model
         
         if request_model:
             def func(params: request_model = Depends()):
-                result = self.operations.execute()
+                ns = {}
+                ns = self.request.put_params_to_ns(params, ns)
+                ns = self.operations.execute(ns)
 
-                return result
+                return ns
         else:
             def func():
                 return self.operations.execute()

@@ -4,9 +4,8 @@ from copy import copy
 
 
 class Operations:
-    def __init__(self, conf: List[Dict[str, str]], db, ns: dict = None):
-        self.db = db
-        self.ns = ns if ns else {}
+    def __init__(self, conf: List[Dict[str, str]], context, ns: dict = None):
+        self.db = context.db
         self.blocks = self.create_blocks(conf) if conf else []
     
     def create_blocks(self, conf: dict):
@@ -18,23 +17,14 @@ class Operations:
         blocks: List[Block] = []
         for block in conf:
             for block_type, block_config in block.items():
-                blocks.append(mapping[block_type](block_config, ns=self.ns, db=self.db))
+                blocks.append(mapping[block_type](block_config, db=self.db))
         
         return blocks
     
-    def execute(self):
+    def execute(self, ns: dict):
         for block in self.blocks:
-            print('ns before:', self.ns)
-            block.execute_tasks()
-            print('ns after:', self.ns)
-        
-        return self.ns
-    
-    def remove_fragile_info_from_result(self):
-        result = copy(self.ns)
-        result.pop('db')
-        return result
-
+            ns = block.execute_tasks(ns)
+        return ns
 
 class Task:
     options_config = {
@@ -42,9 +32,8 @@ class Task:
         'required': []
     }
 
-    def __init__(self, variable: str, options, ns: dict, db) -> None:
+    def __init__(self, variable: str, options, db) -> None:
         self.variable = variable
-        self.ns = ns
         self.db = db
         self.task_type = None  # 'task' / 'task_with_options'
         self.command, self.options = self.recognize_syntax(options)
@@ -65,7 +54,7 @@ class Task:
                 self.task_type = 'task_with_options'
                 return None, options
         except Exception as ex:
-            raise ValueError(f'Failed to parse: {variable}: {options}. Error: {ex}')
+            raise ValueError(f'Failed to parse: {self.variable}: {options}. Error: {ex}')
     
     def create_command(self):
         if self.task_type == 'task':
@@ -99,18 +88,19 @@ class Task:
             k_v_list = [f"{k}={self.convert_python_str_to_sql(v)}" for k, v in value.items()]
             return ', '.join(k_v_list)
     
-    def replace_variables_with_values_from_ns(self, command: str):
-        for k, v in self.ns.items():
+    def replace_variables_with_values_from_ns(self, ns: dict, command: str):
+        result_command = copy(command)
+        for k, v in ns.items():
             print(k, '->', v)
-            command = command.replace(k, str(v))
-        return command
+            result_command = result_command.replace(k, str(v))
+        return result_command
     
-    def execute(self):
+    def execute(self, ns: dict):
         if isinstance(self.command, str):
             args = [
                 self.command, 
                 {}, 
-                self.ns
+                ns
             ]
             if '=' in self.command:  # to do sth more accurate
                 print('executing command:', self.command, 'on', self.variable)
@@ -118,11 +108,13 @@ class Task:
             
             else:
                 print('evaluating command:', self.command, 'on', self.variable)
-                self.ns[self.variable] = eval(*args)
+                ns[self.variable] = eval(*args)
 
         elif isinstance(self.command, Callable):
             print('executing method for variable:', self.variable)
-            self.ns[self.variable] = self.command(self.ns)
+            ns[self.variable] = self.command(ns)
+        
+        return ns
 
 
 class SQLTask(Task):
@@ -131,9 +123,9 @@ class SQLTask(Task):
         
         def db_executor(ns: dict):
             nonlocal query
-            query = self.replace_variables_with_values_from_ns(query)
-            print(f'executing query: {query}')
-            return self.db.execute(query)
+            query_with_values = self.replace_variables_with_values_from_ns(ns, query)
+            print(f'executing query: {query_with_values}')
+            return self.db.execute(query_with_values)
         
         return db_executor
 
@@ -176,9 +168,8 @@ class SQLTask(Task):
 class Block:
     task_type = Task
 
-    def __init__(self, conf: dict, ns: dict, db):
+    def __init__(self, conf: dict, db):
         self.conf = conf
-        self.ns = ns
         self.db = db
         self.tasks = self.create_tasks()
     
@@ -188,18 +179,18 @@ class Block:
             print('creating', self.task_type, 'type task')
             tasks[variable] = self.task_type(
                 variable, 
-                command_or_options, 
-                ns=self.ns,
+                command_or_options,
                 db=self.db
             )
 
         return tasks
     
-    def execute_tasks(self):
+    def execute_tasks(self, ns: dict):
         for name, task in self.tasks.items():
             print(self.__class__.__name__, 'start executing task:', name)
-            task.execute()
-            print('task comleted')        
+            ns = task.execute(ns)
+            print('task comleted')   
+        return ns     
 
 
 class SQLBlock(Block):

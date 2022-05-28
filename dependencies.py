@@ -1,0 +1,2 @@
+def auth():
+    return True
