@@ -17,16 +17,36 @@ db:
   # how to connect to db?
 
 api:
-  get /test:
+  get /users/{user_id}:
+    description: |
+      this endpoint returns user with provided id
+      response contains fields: id, first_name, last_name
     request:
       model: UserModel
 
     operations:
       - sql:
           users:
-            query: select * from users where id=UserModel.user_id
+            query: |
+              select * 
+              from users 
+              where id=UserModel.user_id
+  
+  post /users:
+    request:
+      model: NewUser
+    
+    operations:
+      - sql:
+          users:
+            query: |
+              insert into users 
+              (id, first_name, last_name) 
+              values 
+              (NewUser.id, NewUser.first_name, NewUser.last_name)
 
-  get /users/{user_id}:
+
+  get /test:
     description: "This endpoint will return user specified by id or username."
     request:
       # user pydantic model

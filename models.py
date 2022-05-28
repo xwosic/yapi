@@ -4,4 +4,9 @@ from fastapi import Query
 
 class UserModel(BaseModel):
     user_id: int
-    username: str = Query(None)
+
+
+class NewUser(BaseModel):
+    id: int
+    first_name: str
+    last_name: str

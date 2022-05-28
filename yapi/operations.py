@@ -92,7 +92,7 @@ class Task:
         result_command = copy(command)
         for k, v in ns.items():
             print(k, '->', v)
-            result_command = result_command.replace(k, str(v))
+            result_command = result_command.replace(k, self.convert_python_str_to_sql(v))
         return result_command
     
     def execute(self, ns: dict):

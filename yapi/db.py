@@ -16,14 +16,14 @@ class DB:
                                             connect_args=required_args)
     
     def execute(self, query: str):
-        query = query.lower()
+        lower_query = query.lower()
         try:
-            if 'insert' in query:
+            if 'insert' in lower_query:
                 with self.engine.connect() as conn:
                     conn.execute(query)
                     # return cursor.inserted_primary_key()
             
-            elif 'delete' in query or 'update' in query:
+            elif 'delete' in lower_query or 'update' in lower_query:
                 with self.engine.connect() as conn:
                     conn.execute(query)
             
