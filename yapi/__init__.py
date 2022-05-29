@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from .endpoint import Endpoint
 from .context import Context
 

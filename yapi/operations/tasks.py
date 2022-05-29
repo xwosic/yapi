@@ -1,29 +1,6 @@
-from typing import Callable, Dict, List, Union
 from copy import copy
+from typing import Callable ,Union
 
-
-class Operations:
-    def __init__(self, conf: List[Dict[str, str]], context, ns: dict = None):
-        self.db = context.db
-        self.blocks = self.create_blocks(conf) if conf else []
-    
-    def create_blocks(self, conf: dict):
-        mapping = {
-            'sql': SQLBlock,
-            'python': PythonBlock,
-            'request': RequestBlock
-        }
-        blocks: List[Block] = []
-        for block in conf:
-            for block_type, block_config in block.items():
-                blocks.append(mapping[block_type](block_config, db=self.db))
-        
-        return blocks
-    
-    def execute(self, ns: dict):
-        for block in self.blocks:
-            ns = block.execute_tasks(ns)
-        return ns
 
 class Task:
     options_config = {
@@ -132,43 +109,3 @@ class SQLTask(Task):
         'command_preparation': command_creator,
         'required': ['query']
     }
-
-
-class Block:
-    task_type = Task
-
-    def __init__(self, conf: dict, db):
-        self.conf = conf
-        self.db = db
-        self.tasks = self.create_tasks()
-    
-    def create_tasks(self):
-        tasks: Dict[self.task_type] = {}
-        for variable, command_or_options in self.conf.items():
-            print('creating', self.task_type, 'type task')
-            tasks[variable] = self.task_type(
-                variable, 
-                command_or_options,
-                db=self.db
-            )
-
-        return tasks
-    
-    def execute_tasks(self, ns: dict):
-        for name, task in self.tasks.items():
-            print(self.__class__.__name__, 'start executing task:', name)
-            ns = task.execute(ns)
-            print('task comleted')   
-        return ns     
-
-
-class SQLBlock(Block):
-    task_type = SQLTask
-
-
-class PythonBlock(Block):
-    pass
-
-
-class RequestBlock(PythonBlock):
-    pass
