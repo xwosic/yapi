@@ -17,13 +17,20 @@ class DB:
     
     def execute(self, query: str):
         lower_query = query.lower()
+        no_result = [
+            'create',
+            'delete', 
+            'insert',
+            'update'
+        ]
         try:
-            if 'insert' in lower_query:
-                with self.engine.connect() as conn:
-                    conn.execute(query)
-                    # return cursor.inserted_primary_key()
-            
-            elif 'delete' in lower_query or 'update' in lower_query:
+            in_query = []
+            for clause in no_result:
+                if clause in lower_query:
+                    in_query.append(True)
+                else:
+                    in_query.append(False)
+            if any(in_query):
                 with self.engine.connect() as conn:
                     conn.execute(query)
             

@@ -63,6 +63,8 @@ class Task:
         elif isinstance(value, dict):
             k_v_list = [f"{k}={self.convert_python_str_to_sql(v)}" for k, v in value.items()]
             return ', '.join(k_v_list)
+        elif value is None:
+            return 'null'
     
     def replace_variables_with_values_from_ns(self, ns: dict, command: str):
         result_command = copy(command)

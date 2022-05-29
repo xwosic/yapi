@@ -1,0 +1,31 @@
+test_sql_task:
+  result:
+    query: select * from test_operations
+
+test_sql_where:
+  result:
+    query: |
+      select * 
+      from test_operations 
+      where id=1
+
+test_sql_add:
+  result:
+    query: |
+      insert into test_operations
+      (name, age)
+      values
+      ('d', 4);
+
+test_sql_update:
+  result:
+    query: |
+      update test_operations
+      set name='e', age=5
+      where id=4
+
+test_sql_delete:
+  result:
+    query: |
+      delete from test_operations
+      where id=4

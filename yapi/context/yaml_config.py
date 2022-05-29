@@ -8,3 +8,6 @@ class Yamloader:
 
     def __getitem__(self, key: str):
         return self.content.get(key)
+    
+    def __str__(self):
+        return str(self.content)
