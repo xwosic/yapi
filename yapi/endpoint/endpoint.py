@@ -1,6 +1,5 @@
-from yapi.endpoint.request import YappRequest
-# from .utils import book
 from fastapi import Depends
+from .request import YappRequest
 from ..context import Context
 from ..operations import Operations
 

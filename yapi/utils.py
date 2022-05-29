@@ -1,7 +1,3 @@
-from copy import copy
-from socket import if_indextoname
-
-
 class book(dict):
     def __init__(self, *args, **kwargs):
         for a in args:

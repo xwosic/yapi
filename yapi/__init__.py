@@ -1,6 +1,6 @@
-from fastapi import FastAPI
-from .endpoint import Endpoint
 from .context import Context
+from .endpoint import Endpoint
+from fastapi import FastAPI
 
 
 class Yapp(FastAPI):
