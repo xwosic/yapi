@@ -41,7 +41,10 @@ def sqltask() -> SQLTask:
         conf = test_conf[task_conf_name]
         variable = list(conf.keys())[0]
         options = list(conf.values())[0]
-        return SQLTask(variable=variable, options=options, db=db)
+        return SQLTask(variable=variable,
+                       options=options,
+                       db=db,
+                       ignore_nulls=False)
     return creator
 
 
@@ -102,7 +105,53 @@ def test_sql_delete(sqltask: Task):
     assert ns == {'result': [{'age': 1, 'id': 1, 'name': 'a'},
                              {'age': 2, 'id': 2, 'name': 'b'},
                              {'age': 3, 'id': 3, 'name': 'c'}]}
-                             
+
+
+@pytest.mark.order(6)
+def test_optional_filter(sqltask: Task):
+    task = sqltask('test_optional_filter')
+    task.ignore_nulls = True
+    # request which two antagonictic
+    # conditions
+    ns = {
+        'Model.id': 1,
+        'Model.name': 'b',
+        'Model.age': None
+    }
+    ns_after = task.execute(ns)
+    assert ns_after == {**ns, 'result': []}
+    # request with filtering by id
+    ns['Model.name'] = None
+    ns_after = task.execute(ns)
+    assert ns_after == {'Model.age': None,
+                        'Model.id': 1,
+                        'Model.name': None,
+                        'result': [{'age': 1, 'id': 1, 'name': 'a'}]}
+    # request with filtering by age
+    ns = {
+        'Model.id': None,
+        'Model.name': None,
+        'Model.age': 3
+    }
+    ns_after = task.execute(ns)
+    assert ns_after == {'Model.age': 3,
+                        'Model.id': None,
+                        'Model.name': None,
+                        'result': [{'age': 3, 'id': 3, 'name': 'c'}]}
+    # request without filtering returns all
+    ns = {
+        'Model.id': None,
+        'Model.name': None,
+        'Model.age': None
+    }
+    ns_after = task.execute(ns)
+    assert ns_after == {'Model.age': None,
+                        'Model.id': None,
+                        'Model.name': None,
+                        'result': [{'age': 1, 'id': 1, 'name': 'a'},
+                                   {'age': 2, 'id': 2, 'name': 'b'},
+                                   {'age': 3, 'id': 3, 'name': 'c'}]}
+
 
 @pytest.mark.order(-1)
 def test_drop_table():

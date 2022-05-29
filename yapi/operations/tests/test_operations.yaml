@@ -29,3 +29,11 @@ test_sql_delete:
     query: |
       delete from test_operations
       where id=4
+
+test_optional_filter:
+  result:
+    query: |
+      select * from test_operations
+      where id=Model.id
+      and name=Model.name
+      and age = Model.age
