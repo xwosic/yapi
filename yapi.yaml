@@ -30,6 +30,7 @@ api:
               from users
               where id=FilterUser.id
               and first_name=FilterUser.first_name
+              and last_name=FilterUser.last_name
 
   get /users/{user_id}:
     description: |
