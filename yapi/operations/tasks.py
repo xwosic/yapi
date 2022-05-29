@@ -1,3 +1,4 @@
+import re
 from copy import copy
 from typing import Callable ,Union
 
@@ -8,10 +9,11 @@ class Task:
         'required': []
     }
 
-    def __init__(self, variable: str, options, db) -> None:
+    def __init__(self, variable: str, options, db, ignore_nulls: bool) -> None:
         self.variable = variable
         self.db = db
         self.task_type = None  # 'task' / 'task_with_options'
+        self.ignore_nulls = ignore_nulls
         self.command, self.options = self.recognize_syntax(options)
         self.command = self.create_command()
     
@@ -73,6 +75,15 @@ class Task:
             result_command = result_command.replace(k, self.convert_python_str_to_sql(v))
         return result_command
     
+    def replace_nulls_with_neutral_conditions(self, command: str):
+        if self.ignore_nulls:
+            null_count = command.count('null')
+            print('count', null_count)
+            for _ in range(null_count):
+                # catch all foo=null or bar = null
+                command = re.sub('\S* ?= ?null', '1=1', command, count=null_count)
+        return command
+    
     def execute(self, ns: dict):
         if isinstance(self.command, str):
             args = [
@@ -102,6 +113,7 @@ class SQLTask(Task):
         def db_executor(ns: dict):
             nonlocal query
             query_with_values = self.replace_variables_with_values_from_ns(ns, query)
+            query_with_values = self.replace_nulls_with_neutral_conditions(query_with_values)
             print(f'executing query: {query_with_values}')
             return self.db.execute(query_with_values)
         

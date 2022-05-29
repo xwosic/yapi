@@ -5,9 +5,10 @@ from .tasks import Task, SQLTask
 class Block:
     task_type = Task
 
-    def __init__(self, conf: dict, db):
+    def __init__(self, conf: dict, db, ignore_nulls: bool):
         self.conf = conf
         self.db = db
+        self.ignore_nulls = ignore_nulls
         self.tasks = self.create_tasks()
     
     def create_tasks(self):
@@ -17,7 +18,8 @@ class Block:
             tasks[variable] = self.task_type(
                 variable, 
                 command_or_options,
-                db=self.db
+                db=self.db,
+                ignore_nulls=self.ignore_nulls
             )
 
         return tasks

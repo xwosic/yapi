@@ -22,9 +22,12 @@ class YappRequest:
         self.context_dependencies = context.dependencies
         self.request_model = None
         self.dependencies = None
+        self.ignore_nulls = False
         if conf:
             self.request_model = self.get_model(conf)
             self.dependencies = self.get_dependencies(conf)
+            context.operations_kwargs = {'ignore_nulls': self.ignore_nulls}
+            print(context.operations_kwargs)
     
     def get_model(self, conf: dict) -> Optional[BaseModel]:
         """
@@ -38,6 +41,11 @@ class YappRequest:
             except KeyError:
                 raise ValueError(f'There is no {model_name}'
                                  ' in models.py')
+            
+            for v in model.__fields__.values():
+                if not v.required:
+                    self.ignore_nulls = True
+                    break
             return model
     
     def get_dependencies(self, conf: dict):

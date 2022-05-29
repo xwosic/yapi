@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from fastapi import Query
+from typing import Optional
 
 
 class UserId(BaseModel):
@@ -10,3 +10,9 @@ class User(BaseModel):
     id: int
     first_name: str
     last_name: str
+
+
+class FilterUser(BaseModel):
+    id: Optional[int]
+    first_name: Optional[str]
+    last_name: Optional[str]
