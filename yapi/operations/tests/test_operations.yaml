@@ -36,4 +36,4 @@ test_optional_filter:
       select * from test_operations
       where id=Model.id
       and name=Model.name
-      and age = Model.age
+      and age > Model.age

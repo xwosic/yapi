@@ -131,10 +131,10 @@ def test_optional_filter(sqltask: Task):
     ns = {
         'Model.id': None,
         'Model.name': None,
-        'Model.age': 3
+        'Model.age': 2
     }
     ns_after = task.execute(ns)
-    assert ns_after == {'Model.age': 3,
+    assert ns_after == {'Model.age': 2,
                         'Model.id': None,
                         'Model.name': None,
                         'result': [{'age': 3, 'id': 3, 'name': 'c'}]}

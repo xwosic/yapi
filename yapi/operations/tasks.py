@@ -81,7 +81,7 @@ class Task:
             print('count', null_count)
             for _ in range(null_count):
                 # catch all foo=null or bar = null
-                command = re.sub('\S* ?= ?null', '1=1', command, count=null_count)
+                command = re.sub(r'\S* ?[=<>] ?null', '1=1', command, count=null_count)
         return command
     
     def execute(self, ns: dict):
