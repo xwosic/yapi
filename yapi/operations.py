@@ -1,4 +1,3 @@
-import re
 from typing import Callable, Dict, List, Union
 from copy import copy
 
@@ -133,36 +132,6 @@ class SQLTask(Task):
         'command_preparation': command_creator,
         'required': ['query']
     }
-
-
-# class TaskWithOptions(Task):
-#     def __init__(self, variable: str, options: dict, ns: dict):
-#         self.variable = variable
-#         self.options = options
-#         self.ns = ns
-#         self.command = self.create_command()
-
-#     def create_command(self):
-#         raise NotImplementedError('Define command.')
-
-# # query = 'select * from users'
-# # result = self.context.db.execute(query)
-
-
-# class SQLTask(TaskWithOptions):
-#     def create_command(self):
-#         query: str = self.options.get('query')
-#         if query is None:
-#             raise NotImplementedError(
-#                 '"query" field is required '
-#                 'in sql options.'
-#             )
-#         if not query.startswith('"') \
-#            and not query.startswith("'"):
-#             query = '"' + query + '"'
-        
-#         self.command = f'db.execute({query})'
-#         print('command created', self.command)
 
 
 class Block:
