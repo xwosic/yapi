@@ -1,8 +1,8 @@
-from yapi.request import YappRequest
-from .utils import book
+from yapi.endpoint.request import YappRequest
+# from .utils import book
 from fastapi import Depends
-from .context import Context
-from .operations import Operations
+from ..context import Context
+from ..operations import Operations
 
 
 class Endpoint:
@@ -12,7 +12,7 @@ class Endpoint:
         self.context = context
         self.request = YappRequest(self.context.config['api'][self.name].get('request'), self.context)
         self.operations = Operations(self.context.config['api'][self.name].get('operations'), self.context)
-        self.response = book(self.context.config['api'][self.name].get('response'))
+        # self.response = book(self.context.config['api'][self.name].get('response'))
         self.description = self.context.config['api'][self.name].get('description')
         print(self.name, ' -> endpoint call generation')
         self.generated_function = self.generate_call()
