@@ -50,7 +50,8 @@ class YappRequest:
             if not v.required:
                 self.ignore_nulls = True
                 break
-            return model
+        return model
+        
     
     def get_dependencies(self, conf: dict):
         """

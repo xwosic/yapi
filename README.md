@@ -20,12 +20,11 @@ api:
             model: FooModel
         operations:
             - sql: 
-                $db_result:
+                db_result:
                     query: select * from foo_table
             - python:
-                $endpoint_response: parse_response($db_result)
+                endpoint_response: parse_response(db_result)
         response:
-            result: $endpoint_response
             model: FooResponseModel
 
 ```
@@ -60,4 +59,9 @@ class FooResponseModel(BaseModel):
     usermane: str
     birth_date: datetime
 
+```
+
+in terminal run:
+``` shell
+python -m uvicorn main:app
 ```

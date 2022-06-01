@@ -31,6 +31,8 @@ api:
               where id=FilterUser.id
               and first_name=FilterUser.first_name
               and last_name=FilterUser.last_name
+    response:
+      model: User
 
   get /users/{user_id}:
     description: |
