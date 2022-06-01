@@ -1,4 +1,28 @@
-from fastapi import Depends
+"""
+#usage
+
+```yaml
+<not in config> -> return null
+
+response: -> return null
+
+response: ~ -> return null
+
+response: null -> return null
+
+response:
+    model: SomeModel -> return one or list of models
+
+response:
+    variable: variable_name -> return VALUE of variable from namespace
+
+response:
+    variable: foo
+    model: bar -> raise implementation error
+
+```
+"""
+
 from pydantic import BaseModel
 from typing import Optional
 from .request import YappRequest
@@ -10,21 +34,26 @@ class YappResponse(YappRequest):
     * uses models from models.py
     * takes from endpoint's namespace defined values
     and retuns them to client
-    * if not defined - returns everything from ns
-    * if variable defined - returns variable
-    * if model defined - returns model or list of models
     """
     def __init__(self, conf: dict, context) -> None:
         self.models = context.models
         self.response_model = None
         self.response_variable = None
+        self.return_all = False
+        self.to_return = None
         if conf:
-            self.response_model = self.get_model(conf)
-            self.model_fields = self.set_fields(self.response_model)
-            self.response_variable = self.get_variable(conf)
-            if self.response_model and self.response_variable:
-                raise ValueError('Error in response config:'
-                                 'Define response model XOR variable.')
+            if isinstance(conf, dict):
+                self.response_model = self.get_model(conf)
+                self.model_fields = self.set_fields(self.response_model)
+                self.response_variable = self.get_variable(conf)
+                if self.response_model and self.response_variable:
+                    raise ValueError('Error in response config:'
+                                     'Define response model XOR variable.')
+            else:
+                if conf == 'all':
+                    self.return_all = True
+                else:
+                    self.to_return = conf
     
     def set_fields(self, model: Optional[BaseModel]):
         if model:
@@ -67,5 +96,9 @@ class YappResponse(YappRequest):
             # with name from config
             if self.response_variable in ns:
                 return ns[self.response_variable]
-        else:
+        elif self.return_all:
             return ns
+        elif self.to_return:
+            return self.to_return
+        else:
+            return None

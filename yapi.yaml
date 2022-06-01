@@ -59,10 +59,20 @@ api:
       - sql:
           users:
             query: select * from users
+    response: all
   
   post /users:
     request:
       model: User
+      validation:
+        not_in_db:
+          error_msg: this user already exists
+          query: |
+            select * 
+            from users 
+            where 
+            first_name=User.first_name
+            and last_name=User.last_name
     operations:
       - sql:
           users:
@@ -71,10 +81,16 @@ api:
               (id, first_name, last_name) 
               values 
               (User.id, User.first_name, User.last_name)
+    response: ~
   
   put /users/{user_id}:
     request:
       model: User
+      validation:
+        in_db:
+          error_msg: user doesn't exists
+          query: |
+            select id from users where id=User.id
     operations:
       - sql:
           users:
@@ -103,7 +119,6 @@ api:
       model: User  #(take from models folder)
       # in pydantic model there can be validation
       # and here can be extra validation
-
       validation:
         user_id:
           exists_in_db: true
@@ -111,8 +126,6 @@ api:
           default: 18  # optional: false
       dependencies:
         - auth
-
-
     operations:
       # executed from top to bottom
       # sql prefix - on the right site there are sql queries to eval
@@ -134,8 +147,6 @@ api:
       #     $name_of_result:
       #       url: https://some/url
       #       auth: $utils.create_auth_header(id=model.user_id)
-
-    
     # calling functions or running python code from cli
     # command: bash -c "python some_logic.py arg1 arg2 ..."
     logic: /path/to/python/logic/file function_name args, ... , key=values  #(instead of operations)
