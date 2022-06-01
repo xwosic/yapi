@@ -47,6 +47,8 @@ api:
               select * 
               from users 
               where id=UserId.user_id
+    response:
+      variable: users
 
   get /users:
     description: |
@@ -138,4 +140,4 @@ api:
 
     response:
       model: User
-      variable: $name_of_result
+      # variable: $name_of_result

@@ -1,5 +1,6 @@
 from fastapi import Depends
 from .request import YappRequest
+from .response import YappResponse
 from ..context import Context
 from ..operations import Operations
 
@@ -11,7 +12,7 @@ class Endpoint:
         self.context = context
         self.request = YappRequest(self.context.config['api'][self.name].get('request'), self.context)
         self.operations = Operations(self.context.config['api'][self.name].get('operations'), self.context)
-        # self.response = book(self.context.config['api'][self.name].get('response'))
+        self.response = YappResponse(self.context.config['api'][self.name].get('response'), self.context)
         self.description = self.context.config['api'][self.name].get('description')
         print(self.name, ' -> endpoint call generation')
         self.generated_function = self.generate_call()
@@ -41,12 +42,14 @@ class Endpoint:
                 ns = {}
                 ns = self.request.put_params_to_ns(params, ns)
                 ns = self.operations.execute(ns)
-                return ns
+                response = self.response.filter_response_from_ns(ns)
+                return response
         else:
             def endpoint():
                 ns = {}
                 ns = self.operations.execute(ns)
-                return ns
+                response = self.response.filter_response_from_ns(ns)
+                return response
         
         endpoint.__doc__ = self.description if self.description else ""
         return endpoint   

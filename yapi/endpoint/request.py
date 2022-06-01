@@ -5,17 +5,18 @@ from typing import Optional
 
 class YappRequest:
     """
-    * it has to return request model
-    * it has to return dependencies
-    * it has to put dependencies into call's signature 
-        and put dependency result inside namespace
-    * it has to convert model to namespace dict 
+    YappRequest:
+    * returns request model
+    * returns dependencies
+    * puts dependencies into call's signature 
+    and put dependency result inside namespace
+    * converts model to namespace dict 
         {
             'params.param_1': ..., 
             or
             '<model_name>.param_2': ...
         }
-    * perform extra validation INSIDE endpoint call
+    * performs extra validation INSIDE endpoint call
     """
     def __init__(self, conf: dict, context) -> None:
         self.models = context.models
@@ -25,6 +26,7 @@ class YappRequest:
         self.ignore_nulls = False
         if conf:
             self.request_model = self.get_model(conf)
+            self.request_model = self.check_nulls(self.request_model)
             self.dependencies = self.get_dependencies(conf)
             context.operations_kwargs = {'ignore_nulls': self.ignore_nulls}
             print(context.operations_kwargs)
@@ -41,11 +43,13 @@ class YappRequest:
             except KeyError:
                 raise ValueError(f'There is no {model_name}'
                                  ' in models.py')
+            return model
             
-            for v in model.__fields__.values():
-                if not v.required:
-                    self.ignore_nulls = True
-                    break
+    def check_nulls(self, model: BaseModel):
+        for v in model.__fields__.values():
+            if not v.required:
+                self.ignore_nulls = True
+                break
             return model
     
     def get_dependencies(self, conf: dict):
